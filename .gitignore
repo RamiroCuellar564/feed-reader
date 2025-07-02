@@ -48,3 +48,8 @@ Thumbs.db
 *.mov
 *.wmv
 
+# Eclipse IDE
+.settings/
+.classpath
+.project
+/bin/
