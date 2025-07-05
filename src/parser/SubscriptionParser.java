@@ -58,6 +58,10 @@ public class SubscriptionParser extends GeneralParser{
 		this.urlTypeList = urlTypeList;
 	}
 	
+	public int getSubscriptionCount() {
+		return subscriptionList.length();
+	}
+	
 	@Override
 	public void parse() throws Exception {
 		// TODO Auto-generated method stub
@@ -110,21 +114,29 @@ public class SubscriptionParser extends GeneralParser{
 		System.out.println(this.urlTypeList);
 	}
 	
-	public static void main(String[] args) {
+	public static Subscription main(String[] args) {
 		SubscriptionParser parser = new SubscriptionParser("config/subscriptions.json");
+		Subscription subscription = new Subscription(null);
+		
 		try {
 			parser.parse();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		parser.printUrlList();
-		parser.printParamsList();
-		parser.printUrlTypeList();
+		
+		for (int i=0; i<parser.getSubscriptionCount();i++)
+		{
+			SingleSubscription singleSub = new SingleSubscription(parser.getUrlList().get(i), null, parser.getUrlTypeList().get(i));
+			for(int j=0; j<parser.getUrlParamsList().get(i).size();j++){
+				singleSub.setUrlParams(parser.getUrlParamsList().get(i).get(j));
+			}
+			subscription.addSingleSubscription(singleSub);
+			
+		}
 		
 		
-		
-		//SingleSubscription s0 = new SingleSubscription(null, null, null);
+		return subscription;
 	}
 
 
