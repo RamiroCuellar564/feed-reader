@@ -17,129 +17,51 @@ import subscription.SingleSubscription;
  * */
 
 public class SubscriptionParser extends GeneralParser{
-	private JSONArray subscriptionList;
-	private List<String> urlList;
-	private List<List<String>> urlParamsList;
-	private List<String> urlTypeList;
-	
+
 	public SubscriptionParser(String filePath) {
 		super(filePath);
 	}
 	
-	public JSONArray getSubscriptionList() {
-		return subscriptionList;
-	}
 	
-	public void setSubscriptionList(JSONArray subscriptionList) {
-		this.subscriptionList = subscriptionList;
-	}
-	
-	public List<String> getUrlList() {
-		return urlList;
-	}
-
-	public void setUrlList(List<String> urlList) {
-		this.urlList = urlList;
-	}
-
-	public List<List<String>> getUrlParamsList() {
-		return urlParamsList;
-	}
-
-	public void setUrlParamsList(List<List<String>> urlParamsList) {
-		this.urlParamsList = urlParamsList;
-	}
-
-	public List<String> getUrlTypeList() {
-		return urlTypeList;
-	}
-
-	public void setUrlTypeList(List<String> urlTypeList) {
-		this.urlTypeList = urlTypeList;
-	}
-	
-	public int getSubscriptionCount() {
-		return subscriptionList.length();
-	}
-	
-	@Override
-	public void parse() throws Exception {
-		// TODO Auto-generated method stub
+	public Subscription buildSubscription() throws Exception {
 		FileReader reader = null;
 		try {
 			reader = new FileReader(this.filePath);
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
 		JSONArray subList = new JSONArray(new JSONTokener(reader));
-		List<String> urlList = new ArrayList<String>();
-		List<List<String>> urlParamsList = new ArrayList<List<String>>();
-		List<String> urlTypeList = new ArrayList<String>();
+        Subscription subscription = new Subscription(null);
 
-		for (int i = 0; i < subList.length(); i++) {
-		    JSONObject obj = subList.getJSONObject(i);
-		    
-		    urlList.add(obj.getString("url"));
-		    
-		    JSONArray paramsArray = obj.getJSONArray("urlParams");
-		    List<String> paramsList = new ArrayList<>();
-		    for (int j = 0; j < paramsArray.length(); j++) {
-		        paramsList.add(paramsArray.getString(j));
-		    }
-		    urlParamsList.add(paramsList);
-		    
-		    urlTypeList.add(obj.getString("urlType"));
-		}
-		
-		this.subscriptionList = subList;
-		this.urlList = urlList;
-		this.urlParamsList = urlParamsList;
-		this.urlTypeList = urlTypeList;
+        for (int i = 0; i < subList.length(); i++) {
+            JSONObject obj = subList.getJSONObject(i);
+
+
+            String url = obj.getString("url");
+            String urlType = obj.getString("urlType");
+
+            SingleSubscription singleSub = new SingleSubscription(url, null, urlType);
+
+            JSONArray paramsArray = obj.getJSONArray("urlParams");
+            for (int j = 0; j < paramsArray.length(); j++) {
+                singleSub.setUrlParams(paramsArray.getString(j));
+            }
+
+            subscription.addSingleSubscription(singleSub);
+        }
+
+        return subscription;
 		
 	}
 	
-	public void printList() {
-		System.out.print(this.subscriptionList);
-	}
-	
-	public void printUrlList() {
-		System.out.println(this.urlList);
-	}
-	public void printParamsList() {
-		System.out.println(this.urlParamsList);
-	}
-	public void printUrlTypeList() {
-		System.out.println(this.urlTypeList);
-	}
-	
-	public static Subscription main(String[] args) {
-		SubscriptionParser parser = new SubscriptionParser("config/subscriptions.json");
-		Subscription subscription = new Subscription(null);
-		
+	public static void main(String[] args) {
 		try {
-			parser.parse();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		for (int i=0; i<parser.getSubscriptionCount();i++)
-		{
-			SingleSubscription singleSub = new SingleSubscription(parser.getUrlList().get(i), null, parser.getUrlTypeList().get(i));
-			for(int j=0; j<parser.getUrlParamsList().get(i).size();j++){
-				singleSub.setUrlParams(parser.getUrlParamsList().get(i).get(j));
-			}
-			subscription.addSingleSubscription(singleSub);
-			
-		}
-		
-		
-		return subscription;
+            SubscriptionParser parser = new SubscriptionParser("config/subscriptions.json");
+            Subscription subscription = parser.buildSubscription();
+            subscription.prettyPrint();
+        } catch (Exception e) {
+            System.err.println("Error al leer el archivo de suscripciones: " + e.getMessage());
+        }
 	}
-
-
-	
-
 }

@@ -21,6 +21,4 @@ public abstract class GeneralParser {
 		return filePath;
 	}
 	
-	public abstract void parse() throws Exception;
-	
 }
