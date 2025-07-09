@@ -13,8 +13,9 @@ public abstract class GeneralParser {
 	protected String filePath;
 	protected File file;
 	
-	protected GeneralParser(String filePath) {
+	protected GeneralParser(String filePath, File file) {
         this.filePath = filePath;
+        this.file = file;
     }
 	
 	public  String getFilePath() {
