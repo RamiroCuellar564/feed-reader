@@ -6,6 +6,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import parser.SubscriptionParser;
 import subscription.SingleSubscription;
@@ -15,11 +17,21 @@ import subscription.Subscription;
 
 public class httpRequester {
 	private Subscription subscription;
+	private List<String> xmlList;
 	
 	public httpRequester(Subscription sub) {
 		super();
 		this.subscription = sub;
 	}
+	
+	public void setXmlList(List<String> list) {
+		this.xmlList = list;
+	}
+	
+	public List<String> getXmlList(){
+		return xmlList;
+	}
+	
 	
 	public static String getFeedRss(String urlFeed){
 		String feedRssXml = null;
@@ -61,35 +73,43 @@ public class httpRequester {
 		return feedReeditJson;
 	}
 	
-	public String request() {
-		String req = "";
+	public void buildXmlList() {
 		String url;
 		String param;
-		for(int i=0;i<subscription.getSubscriptionsList().size()-1;i++) {
+		List<String> xmlList = new ArrayList<String> ();
+		for(int i=0;i<subscription.getSubscriptionsList().size();i++) {
 			SingleSubscription sub = subscription.getSingleSubscription(i);
-			url = sub.getUrl();
-			for(int j=0;j<sub.getUrlParamsSize()-1;j++) {
-				param = sub.getUrlParams(j);
-				url = url.replace("%s",param);
-				req = req + getFeedRss(url);
+			if(sub.getUrlType().equals("rss")) {
+				url = sub.getUrl();
+				for(int j=0;j<sub.getUrlParamsSize();j++) {
+					param = sub.getUrlParams(j);
+					url = url.replace("%s",param);
+					xmlList.add(getFeedRss(url));
+				}
 			}
 		}
-		
-		return req;
+		setXmlList(xmlList);
+	}
+	
+	public void printXmlList() {
+		for(int i=0;i<this.xmlList.size(); i++) {
+			System.out.println(this.xmlList.get(i));
+		}
 	}
 	
 	public static void main(String[] args) {
-		
+		SubscriptionParser parser = new SubscriptionParser("config/subscriptions.json");
+        Subscription subscription = null;
 		try {
-            SubscriptionParser parser = new SubscriptionParser("config/subscriptions.json");
-            Subscription subscription = parser.buildSubscription();
-            httpRequester feed = new httpRequester(subscription);
-            
-            System.out.println(feed.request());
-            
-        } catch (Exception e) {
-            System.err.println("Error al leer el archivo de suscripciones: " + e.getMessage());
-        }
+			subscription = parser.buildSubscription();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        httpRequester feed = new httpRequester(subscription);
+        feed.buildXmlList();
+        feed.printXmlList();
+        
 	}
 
 }
