@@ -2,9 +2,12 @@ package parser;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-
+import java.util.Locale;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -17,6 +20,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import feed.Article;
 import feed.Feed;
 
 // Esta clase implementa el parser de feed de tipo rss (xml)
@@ -24,30 +28,25 @@ import feed.Feed;
 
 public class RssParser extends GeneralParser {
 	private List<String> xmlList;
-	private List<String> titleList;
-	private List<String> descriptionList;
-	private List<String> pubDateList;
-	private List<String> linkList;
 	private List<Element> roots;
-	private List<String> feedNameList;
+	private List<Feed> feedList;
 	
 	public RssParser(List<String> xmlList) {
 		super(null,null);
 		this.xmlList = new ArrayList<String>(xmlList);
 	}
 	
-	public List<String> getFeedName() {
-		return feedNameList;
+	public List<Feed> getFeedList() {
+		return feedList;
 	}
 
-	public void setFeedName(List<String> feedNameList) {
-		this.feedNameList = feedNameList;
+	public void setFeedList(List<Feed> feedList) {
+		this.feedList = feedList;
 	}
 
 	public List<String> getXmlList() {
 		return xmlList;
 	}
-	
 	
 	public List<Element> getRoots() {
 		return roots;
@@ -61,71 +60,53 @@ public class RssParser extends GeneralParser {
 		this.roots = roots;
 	}
 
-	public List<String> getTitleList() {
-		return titleList;
-	}
-
-	public void setTitleList(List<String> titleList) {
-		this.titleList = titleList;
-	}
-
-	public List<String> getDescriptionList() {
-		return descriptionList;
-	}
-
-	public void setDescriptionList(List<String> descriptionList) {
-		this.descriptionList = descriptionList;
-	}
 	
-	public List<String> getPubDateList() {
-		return pubDateList;
-	}
+	private void parseFeed(List<Element> roots) {
+	    List<Feed> feedList = new ArrayList<>();
 
-	public void setPubDateList(List<String> pubDateList) {
-		this.pubDateList = pubDateList;
-	}
-	
-	public List<String> getLinkList() {
-		return linkList;
-	}
+	    for (Element root : roots) {
+	        List<Article> articleList = new ArrayList<>();
+	        NodeList nList = root.getChildNodes();
+	        Feed feed = new Feed(null);
 
-	public void setLinkList(List<String> linkList) {
-		this.linkList = linkList;
-	}
-	
-	private void setLists(List<Element> roots) {
-		List<String> titleList = new ArrayList<String>();
-		List<String> descriptionList = new ArrayList<String>();
-		List<String> pubDateList = new ArrayList<String>();
-		List<String> linkList = new ArrayList<String>();
-		List<String> feedNameList = new ArrayList<String>();
-		
-		for(Element root: roots) {
-			NodeList nList = root.getChildNodes();
-			
-			for (int temp = 0; temp < nList.getLength(); temp++) {      
+	        for (int temp = 0; temp < nList.getLength(); temp++) {
 	            Node nNode = nList.item(temp);
-	            
-	            if(nNode.getNodeType() == Node.ELEMENT_NODE && nNode.getNodeName().equals("channel")) {
-	            	Element eElement = (Element) nNode;
-	            	feedNameList.add(eElement.getElementsByTagName("title").item(0).getTextContent());
-	            }
-		        if (nNode.getNodeType() == Node.ELEMENT_NODE && nNode.getNodeName().equals("item")) {     
-	               Element eElement = (Element) nNode;
-	               titleList.add(eElement.getElementsByTagName("title").item(0).getTextContent());
-	               descriptionList.add(eElement.getElementsByTagName("title").item(0).getTextContent());
-	               pubDateList.add(eElement.getElementsByTagName("pubDate").item(0).getTextContent());
-	               linkList.add(eElement.getElementsByTagName("pubDate").item(0).getTextContent());
-		        }
-	         }
-		}	
-		setTitleList(titleList);
-		setDescriptionList(descriptionList);
-		setPubDateList(pubDateList);
-		setLinkList(linkList);
-	}
-	
 
+	            if (nNode.getNodeType() == Node.ELEMENT_NODE && nNode.getNodeName().equals("channel")) {
+	                Element currentChannel = (Element) nNode;
+	                feed.setSiteName(currentChannel.getElementsByTagName("title").item(0).getTextContent());
+	            }
+
+	            if (nNode.getNodeType() == Node.ELEMENT_NODE && nNode.getNodeName().equals("item")) {
+	                Element currentItem = (Element) nNode;
+
+	                String pubDateStr = currentItem.getElementsByTagName("pubDate").item(0).getTextContent();
+	                SimpleDateFormat formatter = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z", Locale.ENGLISH);
+	                Date date = null;
+	                try {
+	                    date = formatter.parse(pubDateStr);
+	                } catch (ParseException e) {
+	                    e.printStackTrace();
+	                }
+
+	                Article article = new Article(
+	                    currentItem.getElementsByTagName("title").item(0).getTextContent(),
+	                    currentItem.getElementsByTagName("description").item(0).getTextContent(),
+	                    date,
+	                    currentItem.getElementsByTagName("link").item(0).getTextContent()
+	                );
+	                articleList.add(article);
+	            }
+	        }
+
+	        feed.setArticleList(articleList);
+	        feedList.add(feed);
+	    }
+	    
+	    setFeedList(feedList);
+	}
+
+	
 	private void buildDocument() {	
 		try {
 			DocumentBuilderFactory factory =DocumentBuilderFactory.newInstance();
@@ -147,10 +128,12 @@ public class RssParser extends GeneralParser {
 		}
 	}
 	
-	public Feed BuildFeed() {
-		Feed feed = null;
+	public List<Feed> buildFeed(){
+		buildDocument();
+		parseFeed(getRoots());
 		
-		return feed;
+		
+		return getFeedList();
 	}
 
 }
