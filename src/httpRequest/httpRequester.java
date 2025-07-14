@@ -74,21 +74,23 @@ public class httpRequester {
 	}
 	
 	public void buildXmlList() {
-		String url;
-		String param;
-		List<String> xmlList = new ArrayList<String> ();
-		for(int i=0;i<subscription.getSubscriptionsList().size();i++) {
-			SingleSubscription sub = subscription.getSingleSubscription(i);
-			if(sub.getUrlType().equals("rss")) {
-				url = sub.getUrl();
-				for(int j=0;j<sub.getUrlParamsSize();j++) {
-					param = sub.getUrlParams(j);
-					url = url.replace("%s",param);
-					xmlList.add(getFeedRss(url));
-				}
-			}
-		}
-		setXmlList(xmlList);
+	    List<String> xmlList = new ArrayList<>();
+
+	    for (int i = 0; i < subscription.getSubscriptionsList().size(); i++) {
+	        SingleSubscription sub = subscription.getSingleSubscription(i);
+
+	        if (sub.getUrlType().equals("rss")) {
+	            for (int j = 0; j < sub.getUrlParamsSize(); j++) {
+	                String baseUrl = sub.getUrl();
+	                String param = sub.getUrlParams(j);
+	                String finalUrl = baseUrl.replace("%s", param);
+	                String xml = getFeedRss(finalUrl);
+	                xmlList.add(xml);
+	            }
+	        }
+	    }
+
+	    setXmlList(xmlList);
 	}
 	
 	public void printXmlList() {
@@ -96,7 +98,7 @@ public class httpRequester {
 			System.out.println(this.xmlList.get(i));
 		}
 	}
-	
+
 	public static void main(String[] args) {
 		SubscriptionParser parser = new SubscriptionParser("config/subscriptions.json");
         Subscription subscription = null;
