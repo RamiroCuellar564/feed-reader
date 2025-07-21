@@ -1,7 +1,10 @@
 import java.util.List;
 
+import feed.Article;
 import feed.Feed;
 import httpRequest.httpRequester;
+import namedEntity.NamedEntity;
+import namedEntity.heuristic.QuickHeuristic;
 import parser.RssParser;
 import parser.SubscriptionParser;
 import subscription.Subscription;
@@ -35,15 +38,35 @@ public class FeedReaderMain {
 			}
 			
 		} else if (args.length == 1){
+			SubscriptionParser subParser = new SubscriptionParser("config/subscriptions.json");
+			Subscription subscription = null;
+			QuickHeuristic heuristic = new QuickHeuristic();
+			try {
+				subscription = subParser.buildSubscription();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			httpRequester request = new httpRequester(subscription);
+			request.buildXmlList();
 			
+			List<String> contentList = request.getXmlList();
+			
+			RssParser rssParser = new RssParser(contentList);
+			List<Feed> feedList = rssParser.buildFeed();
+			
+			for(Feed feed: feedList) {
+				feed.prettyPrint();
+				for(Article article: feed.getArticleList()) {
+					article.computeNamedEntities(heuristic);
+					for(NamedEntity namedEntity: article.getNamedEntityList()) {
+						namedEntity.prettyPrint();
+					}
+				}
+			}
 			/*
-			Leer el archivo de suscription por defecto;
-			Llamar al httpRequester para obtenr el feed del servidor
-			Llamar al Parser especifico para extrar los datos necesarios por la aplicacion 
-			Llamar al constructor de Feed
 			Llamar a la heuristica para que compute las entidades nombradas de cada articulos del feed
 			LLamar al prettyPrint de la tabla de entidades nombradas del feed.
-			 */
+			*/
 			
 		}else {
 			printHelp();
