@@ -1,0 +1,9 @@
+package namedEntity;
+
+public final class Title extends Person {
+
+	public Title(String name, String category, int frequency) {
+		super(name, category, frequency, 0);
+	}
+
+}

@@ -7,4 +7,12 @@ public class Person extends NamedEntity {
         super(name, category, frequency);
         this.id = id;
     }
+    
+    public void setId(int id) {
+    	this.id = id;
+    }
+    
+    public int getId() {
+    	return id;
+    }
 }

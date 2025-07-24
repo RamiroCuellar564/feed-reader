@@ -10,6 +10,12 @@ public class NamedEntityFactory {
 			case "Person":
 				personCounter.increment();
 				return new Person(name, category, frequency,personCounter.getValue());
+			case "Name":
+				return new Name(name, category, frequency);
+			case "Surname":
+				return new Surname(name, category, frequency);
+			case "Company":
+				return new Company(name, category, frequency);
 			case "null":
 				break;
 		}
