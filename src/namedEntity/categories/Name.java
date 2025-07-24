@@ -1,4 +1,4 @@
-package namedEntity;
+package namedEntity.categories;
 
 import java.util.ArrayList;
 import java.util.List;

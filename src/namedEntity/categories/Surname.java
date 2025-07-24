@@ -1,4 +1,4 @@
-package namedEntity;
+package namedEntity.categories;
 
 public final class Surname extends Person {
 	protected String origin;

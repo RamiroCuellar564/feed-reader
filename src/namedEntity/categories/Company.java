@@ -1,4 +1,6 @@
-package namedEntity;
+package namedEntity.categories;
+
+import namedEntity.NamedEntity;
 
 public final class Company extends NamedEntity {
 	protected int members;

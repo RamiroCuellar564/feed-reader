@@ -1,4 +1,6 @@
-package namedEntity;
+package namedEntity.categories;
+
+import namedEntity.NamedEntity;
 
 public class Person extends NamedEntity {
     protected int id;
