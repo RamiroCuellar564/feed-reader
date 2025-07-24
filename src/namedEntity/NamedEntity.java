@@ -4,9 +4,9 @@ package namedEntity;
 /*Esta clase modela la nocion de entidad nombrada*/
 
 public abstract class NamedEntity {
-	String name;
-	String category; 
-	int frequency;
+	protected String name;
+	protected String category; 
+	protected int frequency;
 	
 	public NamedEntity(String name, String category, int frequency) {
 		super();

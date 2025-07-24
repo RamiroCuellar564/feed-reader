@@ -7,20 +7,20 @@ import subscription.Counter;
 public class NamedEntityFactory {
 	
 	public static NamedEntity topicFactory(String name, String category, int frequency) {
-		switch(category) {
-		case "Sport":
+		switch(category.toLowerCase()) {
+		case "sport":
 			return new Sport(name, category, frequency);
-		case "Football":
+		case "football":
 			return new Football(name, category, frequency);
-		case "Tennis":
+		case "tennis":
 			return new Tennis(name, category, frequency);
-		case "Formula1":
+		case "formula1":
 			return new Formula1(name, category, frequency);
-		case "Culture":
+		case "culture":
 			return new Culture(name, category, frequency);
-		case "Music":
+		case "music":
 			return new Music(name, category, frequency);
-		case "Politics":
+		case "politics":
 			return new Politics(name, category, frequency);
 		}
 		return null;
@@ -28,33 +28,35 @@ public class NamedEntityFactory {
 
 	public static NamedEntity createNamedEntity(String name, String category, int frequency) {
 		Counter personCounter = new Counter();
-		switch(category) {
-			case "Person":
+		switch(category.toLowerCase()) {
+			case "person":
 				personCounter.increment();
 				return new Person(name, category, frequency,personCounter.getValue());
-			case "Name":
+			case "name":
 				return new Name(name, category, frequency);
-			case "Surname":
+			case "surname":
 				return new Surname(name, category, frequency);
-			case "Company":
+			case "company":
 				return new Company(name, category, frequency);
-			case "Place":
+			case "place":
 				return new Place(name, category, frequency);
-			case "Country":
+			case "country":
 				return new Country(name, category, frequency);
-			case "City":
+			case "city":
 				return new City(name, category, frequency);
-			case "Address":
+			case "address":
 				return new Address(name, category, frequency);
-			case "Product":
+			case "product":
 				return new Product(name, category, frequency);
-			case "Event":
+			case "event":
 				return new Event(name, category, frequency);
-			case "Date":
+			case "date":
 				return new Date(name, category, frequency);
-			case "Topic":
+			case "topic":
 				return topicFactory(name, category, frequency);
 			case "null":
+				break;
+			default:
 				break;
 		}
 		return null;
