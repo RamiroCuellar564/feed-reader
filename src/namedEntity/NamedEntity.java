@@ -3,7 +3,7 @@ package namedEntity;
 
 /*Esta clase modela la nocion de entidad nombrada*/
 
-public class NamedEntity {
+public abstract class NamedEntity {
 	String name;
 	String category; 
 	int frequency;
@@ -50,7 +50,6 @@ public class NamedEntity {
 	public void prettyPrint(){
 		System.out.println(this.getName() + " " + this.getFrequency());
 	}
-	
 	
 }
 

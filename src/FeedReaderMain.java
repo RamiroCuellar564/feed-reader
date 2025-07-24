@@ -58,10 +58,11 @@ public class FeedReaderMain {
 				feed.prettyPrint();
 				for(Article article: feed.getArticleList()) {
 					article.computeNamedEntities(heuristic);
-					for(NamedEntity namedEntity: article.getNamedEntityList()) {
-						namedEntity.prettyPrint();
-					}
 				}
+				feed.buildEntityMap();
+			}
+			for (Feed feed : feedList) {
+			    feed.printEntityTable();
 			}
 			/*
 			Llamar a la heuristica para que compute las entidades nombradas de cada articulos del feed

@@ -6,6 +6,7 @@ import java.util.List;
 
 import namedEntity.NamedEntity;
 import namedEntity.heuristic.Heuristic;
+import namedEntity.NamedEntityFactory;
 
 /*Esta clase modela el contenido de un articulo (ie, un item en el caso del rss feed) */
 
@@ -80,7 +81,8 @@ public class Article {
 	}
 	
 	public void computeNamedEntities(Heuristic h){
-		String text = this.getTitle() + " " +  this.getText();  
+		String text = this.getTitle() + " " +  this.getText();
+		
 			
 		String charsToRemove = ".,;:()'!?\n";
 		for (char c : charsToRemove.toCharArray()) {
@@ -91,7 +93,13 @@ public class Article {
 			if (h.isEntity(s)){
 				NamedEntity ne = this.getNamedEntity(s);
 				if (ne == null) {
-					this.namedEntityList.add(new NamedEntity(s, null,1));
+					String category = h.getCategory(s);
+					if(category != null){
+						ne = NamedEntityFactory.createNamedEntity(s, category, 1);
+						if(ne != null) {
+							this.namedEntityList.add(ne);
+						}
+					}
 				}else {
 					ne.incFrequency();
 				}

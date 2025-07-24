@@ -2,17 +2,24 @@ package feed;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+
+import namedEntity.NamedEntity;
 
 /*Esta clase modela la lista de articulos de un determinado feed*/
 public class Feed {
 	String siteName;
 	List<Article> articleList;
+	List<List<NamedEntity>> namedEntityTable;
+	HashMap<String, Integer> entityMap;
 	
 	public Feed(String siteName) {
 		super();
 		this.siteName = siteName;
 		this.articleList = new ArrayList<Article>();
+		this.namedEntityTable = new ArrayList<List<NamedEntity>>();
+		this.entityMap = new HashMap<String, Integer>();
 	}
 
 	public String getSiteName(){
@@ -55,6 +62,45 @@ public class Feed {
 		}
 		
 	}
+	
+	public void setNamedEntityTable() {
+		for(Article a: this.getArticleList()) {
+			this.namedEntityTable.add(a.getNamedEntityList());
+		}
+	}
+	
+	public void buildEntityMap() {
+		this.setNamedEntityTable();
+		for(List<NamedEntity> row: this.namedEntityTable) {
+			for(NamedEntity ne: row) {
+				String name = ne.getName();
+				if(this.entityMap.containsKey(name)) {
+					int oldFreq = this.entityMap.get(name);
+					int newFreq = oldFreq + ne.getFrequency();
+					this.entityMap.replace(name, newFreq);
+				}else {
+					this.entityMap.put(ne.getName(), ne.getFrequency());
+				}
+			}
+		}
+	}
+	
+	public void printEntityTable() {
+	    System.out.println("FEED: " + this.siteName);
+	    System.out.println("=====================================");
+	    System.out.printf("%-25s %s%n", "Entidad", "Frecuencia");
+	    System.out.println("=====================================");
+
+	    for (String key : this.entityMap.keySet()) {
+	        String name = key;
+	        String frequency = this.entityMap.get(key).toString();
+	        System.out.printf("%-30s %s%n", name, frequency);
+	    }
+
+	    System.out.println("=====================================");
+	}
+	
+	
 	
 	public static void main(String[] args) {
 		  Article a1 = new Article("This Historically Black University Created Its Own Tech Intern Pipeline",
