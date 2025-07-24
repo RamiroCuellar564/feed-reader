@@ -3,6 +3,10 @@ package subscription;
 public final class Counter{
 	static private int value = 0;
 	
+	public int getValue() {
+		return value;
+	}
+	
 	public void increment(){
 		value = value + 1;
 	}
